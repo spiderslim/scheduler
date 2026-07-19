@@ -361,7 +361,7 @@ export default function App() {
             <div className="space-y-1">
               <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Roster Coverage</span>
               <p className="text-2xl font-black text-slate-800 dark:text-white leading-none">{stats.scheduledHours.toFixed(1)} hrs</p>
-              <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">{stats.ftCount} FT · {stats.ptCount} PT associates active</p>
+              <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">{stats.ftCount} FT Ã‚Â· {stats.ptCount} PT associates active</p>
             </div>
             <div className="w-11 h-11 rounded-xl bg-indigo-100 text-indigo-800 dark:bg-indigo-950/45 dark:text-indigo-300 flex items-center justify-center">
               <Clock className="w-5 h-5" />
@@ -425,7 +425,7 @@ export default function App() {
           <Suspense
             fallback={
               <div className="h-64 flex items-center justify-center text-sm text-slate-400 dark:text-slate-500">
-                Loading chart…
+                Loading chartâ€¦
               </div>
             }
           >
