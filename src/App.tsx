@@ -4,15 +4,13 @@ import Scheduler from './components/Scheduler';
 import TargetEditor from './components/TargetEditor';
 import CoverageChart from './components/CoverageChart';
 import TemplatesModal from './components/TemplatesModal';
-import GeminiCopilot from './components/GeminiCopilot';
 import { EditShiftPopover, AddShiftModal } from './components/Modals';
 import ConfirmDialog, { ConfirmOptions } from './components/ConfirmDialog';
-import { Shift, Template, Mutation, INITIAL_SHIFTS, DEFAULT_TARGETS } from './types/index';
+import { Shift, Template, INITIAL_SHIFTS, DEFAULT_TARGETS } from './types/index';
 import { decimalFromTimeInput, roundHalf } from './lib/utils';
 import { computeHourlyCoverage, summarizeCoverage } from './lib/coverage';
-import { applyMutations } from './lib/mutations';
 import { nextShiftId } from './lib/shiftIds';
-import { ZoomIn, ZoomOut, Maximize, Trash2, Copy, Clock, DollarSign, Award, Sparkles } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize, Trash2, Copy, Clock, DollarSign, Award } from 'lucide-react';
 
 const SHIFTS_STORAGE_KEY = 'shiftsync.opus.shifts.v2';
 
@@ -233,18 +231,6 @@ export default function App() {
     setTemplates(prev => prev.filter(t => t.id !== id));
   };
 
-  // Safe mutation application engine for Gemini chat / optimize / audit outputs.
-  const handleApplyMutations = (mutations: Mutation[]) => {
-    setShifts(prev => applyMutations(prev, mutations).shifts);
-
-    const lastTargets = [...mutations]
-      .reverse()
-      .find(m => m.type === 'set_targets' && Array.isArray(m.targets));
-    if (lastTargets?.targets) {
-      updateTargets(lastTargets.targets);
-    }
-  };
-
   // Shared per-hour coverage, computed once and passed to all consumers.
   const coverage = useMemo(() => computeHourlyCoverage(shifts, targets), [shifts, targets]);
 
@@ -301,9 +287,6 @@ export default function App() {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row gap-6 items-start justify-between bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors duration-200">
           <div>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 mb-2">
-              <Sparkles className="w-3 h-3 animate-pulse" /> AI-Powered Operations
-            </span>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Interactive Master Schedule</h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm max-w-3xl leading-relaxed">
               Timeline covers <strong className="text-slate-700 dark:text-slate-300">5 a.m. to 10 p.m.</strong> Drag blocks horizontally to change start times. Resize using the right edge grabber. Drag the striped meal segment to reposition lunch. Drop a shift over another row to quickly swap allocations. <strong className="text-slate-700 dark:text-slate-300">Right-click</strong> any shift block for explicit time editing or to duplicate/delete.
@@ -395,41 +378,27 @@ export default function App() {
           </div>
         </section>
 
-        {/* Analytics & Gemini splits */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Analytics Chart & Target sliders */}
-          <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col transition-colors duration-200">
-            <div className="mb-6">
-              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Coverage Analytics</h2>
-              <p className="text-slate-500 dark:text-slate-400 text-sm max-w-3xl leading-relaxed">
-                Compare actual scheduled <strong className="text-indigo-600 dark:text-indigo-400">associate-hours</strong> (bars) against your <strong className="text-slate-900 dark:text-white">baseline targets</strong> (line). Red bars indicate a deficit, yellow indicates a warning. Edits strictly persist in your local browser storage.
-              </p>
-            </div>
-            
-            <TargetEditor 
-              targets={targets}
-              onChangeTarget={(idx, val) => {
-                const nt = [...targets];
-                nt[idx] = val;
-                updateTargets(nt);
-              }}
-              onResetTargets={() => updateTargets(DEFAULT_TARGETS)}
-            />
-
-            <CoverageChart coverage={coverage} isDarkMode={isDarkMode} />
+        {/* Coverage Analytics */}
+        <section className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col transition-colors duration-200">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Coverage Analytics</h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm max-w-3xl leading-relaxed">
+              Compare actual scheduled <strong className="text-indigo-600 dark:text-indigo-400">associate-hours</strong> (bars) against your <strong className="text-slate-900 dark:text-white">baseline targets</strong> (line). Red bars indicate a deficit, yellow indicates a warning. Edits strictly persist in your local browser storage.
+            </p>
           </div>
 
-          {/* Right Column: Gemini 3.5 Assistant */}
-          <div className="lg:col-span-5">
-            <GeminiCopilot 
-              shifts={shifts}
-              targets={targets}
-              onApplyMutations={handleApplyMutations}
-              onOverwriteShifts={(newShifts) => setShifts(newShifts)}
-              requestConfirm={requestConfirm}
-            />
-          </div>
-        </div>
+          <TargetEditor 
+            targets={targets}
+            onChangeTarget={(idx, val) => {
+              const nt = [...targets];
+              nt[idx] = val;
+              updateTargets(nt);
+            }}
+            onResetTargets={() => updateTargets(DEFAULT_TARGETS)}
+          />
+
+          <CoverageChart coverage={coverage} isDarkMode={isDarkMode} />
+        </section>
       </main>
 
       <EditShiftPopover 

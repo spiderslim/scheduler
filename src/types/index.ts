@@ -24,50 +24,6 @@ export interface Template {
   targets: number[];
 }
 
-/**
- * Loosely-typed shift fields coming from the Gemini API. The model may omit
- * fields or send partials, so everything is optional and gets sanitized when a
- * mutation is applied.
- */
-export interface ShiftInput {
-  name?: string;
-  role?: string;
-  type?: 'FT' | 'PT';
-  start?: number;
-  duration?: number;
-  meal?: Meal;
-}
-
-/**
- * The action vocabulary shared between the Gemini endpoints and the client
- * mutation engine. `remove_shift` is an alias the auditor emits for
- * `delete_shift`; both are normalized in applyMutations.
- */
-export type MutationType =
-  | 'add_shift'
-  | 'delete_shift'
-  | 'remove_shift'
-  | 'adjust_shift'
-  | 'clear_all'
-  | 'set_targets';
-
-export interface Mutation {
-  type: MutationType;
-  shift?: ShiftInput;
-  shiftId?: string;
-  targets?: number[];
-}
-
-export type SuggestedAction = Mutation;
-
-export interface AuditFinding {
-  type: 'gap' | 'meal_violation' | 'fatigue' | 'overstaffing' | 'other';
-  severity: 'critical' | 'warning' | 'info';
-  message: string;
-  hour?: number;
-  suggestedAction?: SuggestedAction;
-}
-
 export const INITIAL_SHIFTS: Shift[] = [
   {
     "id": "e1",
