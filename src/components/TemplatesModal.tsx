@@ -29,7 +29,7 @@ export default function TemplatesModal({ isOpen, onClose, templates, onSave, onL
   return (
     <>
       <div className="fixed inset-0 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-sm z-50 transition-opacity" onClick={onClose} />
-      <div ref={containerRef} role="dialog" aria-modal="true" aria-label="Schedule templates" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white dark:bg-slate-900 rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-slate-200 dark:border-slate-800 transition-colors">
+      <div ref={containerRef} role="dialog" aria-modal="true" aria-label="Schedule templates" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white dark:bg-slate-900 rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 transition-colors">
         
         <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 transition-colors">
           <div className="flex items-center gap-2">
