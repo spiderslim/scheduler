@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react';
 import Navbar from './components/Navbar';
 import Scheduler from './components/Scheduler';
 import TargetEditor from './components/TargetEditor';
-import CoverageChart from './components/CoverageChart';
 import TemplatesModal from './components/TemplatesModal';
 import { EditShiftPopover, AddShiftModal } from './components/Modals';
 import ConfirmDialog, { ConfirmOptions } from './components/ConfirmDialog';
@@ -10,10 +9,16 @@ import { Shift, Template } from './types/index';
 import { INITIAL_SHIFTS, DEFAULT_TARGETS } from './lib/defaults';
 import { decimalFromTimeInput, roundHalf } from './lib/utils';
 import { computeHourlyCoverage, summarizeCoverage } from './lib/coverage';
+import { getLaborRate } from './lib/rates';
 import { nextShiftId } from './lib/shiftIds';
 import { ZoomIn, ZoomOut, Maximize, Trash2, Copy, Clock, DollarSign, Award } from 'lucide-react';
 
+// Recharts is the largest client chunk; load the chart on demand.
+const CoverageChart = lazy(() => import('./components/CoverageChart'));
+
 const SHIFTS_STORAGE_KEY = 'shiftsync.opus.shifts.v2';
+const DARK_MODE_STORAGE_KEY = 'shiftsync.opus.darkmode.v1';
+const TEMPLATES_STORAGE_KEY = 'shiftsync.opus.templates.v2';
 
 function isValidShift(s: unknown): s is Shift {
   if (!s || typeof s !== 'object') return false;
@@ -25,6 +30,19 @@ function isValidShift(s: unknown): s is Shift {
     (v.type === 'FT' || v.type === 'PT') &&
     typeof v.start === 'number' &&
     typeof v.duration === 'number'
+  );
+}
+
+function isValidTemplate(t: unknown): t is Template {
+  if (!t || typeof t !== 'object') return false;
+  const v = t as Record<string, unknown>;
+  return (
+    typeof v.id === 'string' &&
+    typeof v.name === 'string' &&
+    Array.isArray(v.shifts) &&
+    v.shifts.every(isValidShift) &&
+    Array.isArray(v.targets) &&
+    v.targets.every(n => typeof n === 'number')
   );
 }
 
@@ -45,10 +63,15 @@ function loadStoredShifts(): Shift[] {
 
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return document.documentElement.classList.contains('dark');
+    try {
+      const stored = localStorage.getItem(DARK_MODE_STORAGE_KEY);
+      if (stored !== null) {
+        return JSON.parse(stored) === true;
+      }
+    } catch (e) {
+      console.warn('Failed to load dark mode preference.', e);
     }
-    return false;
+    return document.documentElement.classList.contains('dark');
   });
 
   useEffect(() => {
@@ -56,6 +79,11 @@ export default function App() {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
+    }
+    try {
+      localStorage.setItem(DARK_MODE_STORAGE_KEY, JSON.stringify(isDarkMode));
+    } catch (e) {
+      console.warn('Failed to persist dark mode preference.', e);
     }
   }, [isDarkMode]);
 
@@ -74,17 +102,22 @@ export default function App() {
   const [isTemplatesModalOpen, setIsTemplatesModalOpen] = useState(false);
   const [templates, setTemplates] = useState<Template[]>(() => {
     try {
-      const stored = localStorage.getItem('shiftsync.opus.templates.v2');
+      const stored = localStorage.getItem(TEMPLATES_STORAGE_KEY);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.every(isValidTemplate)) {
+          return parsed;
+        }
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Failed to load stored templates; starting empty.', e);
+    }
     return [];
   });
   
   useEffect(() => {
     try {
-      localStorage.setItem('shiftsync.opus.templates.v2', JSON.stringify(templates));
+      localStorage.setItem(TEMPLATES_STORAGE_KEY, JSON.stringify(templates));
     } catch (e) {}
   }, [templates]);
   
@@ -239,15 +272,6 @@ export default function App() {
   const stats = useMemo(() => {
     const { coverageScore } = summarizeCoverage(coverage);
 
-    // Compute standard operational rate mappings
-    const getLaborRate = (role: string) => {
-      const r = role.toLowerCase();
-      if (r.includes('supervisor') || r.includes('manager')) return 25;
-      if (r.includes('baker') || r.includes('chef')) return 18;
-      if (r.includes('barista') || r.includes('cashier')) return 15;
-      return 14; 
-    };
-
     const scheduledHours = shifts.reduce((acc, s) => acc + (s.duration - (s.meal?.duration || 0)), 0);
     const laborCost = Math.round(shifts.reduce((acc, s) => {
       const hours = s.duration - (s.meal?.duration || 0);
@@ -347,7 +371,7 @@ export default function App() {
           {/* Card 3: Budget Analysis */}
           <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between gap-4 transition-colors">
             <div className="space-y-1">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Labor Spending</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Estimated Labor Spending</span>
               <p className="text-2xl font-black text-slate-800 dark:text-white leading-none">${stats.laborCost.toLocaleString()}</p>
               <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">Estimated based on standard role rates</p>
             </div>
@@ -398,7 +422,15 @@ export default function App() {
             onResetTargets={() => updateTargets(DEFAULT_TARGETS)}
           />
 
-          <CoverageChart coverage={coverage} isDarkMode={isDarkMode} />
+          <Suspense
+            fallback={
+              <div className="h-64 flex items-center justify-center text-sm text-slate-400 dark:text-slate-500">
+                Loading chart…
+              </div>
+            }
+          >
+            <CoverageChart coverage={coverage} isDarkMode={isDarkMode} />
+          </Suspense>
         </section>
       </main>
 
