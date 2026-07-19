@@ -1,8 +1,0 @@
-{
-  "name": "ShiftSync Flash 3.5",
-  "description": "Interactive shift scheduling platform with real-time coverage analytics and fluid drag-and-drop timelines.",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
-}
