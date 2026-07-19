@@ -85,7 +85,7 @@ export function EditShiftPopover({ shift, position, onClose, onApply, onDelete, 
   return (
     <>
       <div className="fixed inset-0 z-50 bg-slate-900/20 dark:bg-slate-900/50 backdrop-blur-sm transition-colors duration-200" onClick={onClose} />
-      <div ref={containerRef} role="dialog" aria-modal="true" aria-label={`Edit shift ${shift.name}`} style={style} className="w-72 bg-white dark:bg-slate-900 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 p-5 overflow-hidden animate-in fade-in zoom-in-95 duration-200 transition-colors">
+      <div ref={containerRef} role="dialog" aria-modal="true" aria-label={`Edit shift ${shift.name}`} style={style} className="w-72 bg-white dark:bg-slate-900 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 p-5 overflow-hidden transition-colors">
         <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white leading-tight">Edit Shift</h3>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 pb-4">{shift.name}</p>
 
@@ -210,7 +210,7 @@ export function AddShiftModal({ isOpen, onClose, onAdd, initialData }: AddShiftM
     <>
       <div className="fixed inset-0 z-50 bg-slate-900/20 dark:bg-slate-900/50 backdrop-blur-sm transition-colors duration-200" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-        <div ref={containerRef} role="dialog" aria-modal="true" aria-label={initialData ? 'Duplicate shift' : 'Add new shift'} className="bg-white dark:bg-slate-900 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 w-full max-w-md p-6 pointer-events-auto animate-in zoom-in-95 duration-200 transition-colors">
+        <div ref={containerRef} role="dialog" aria-modal="true" aria-label={initialData ? 'Duplicate shift' : 'Add new shift'} className="bg-white dark:bg-slate-900 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 w-full max-w-md p-6 pointer-events-auto transition-colors">
           <div className="flex justify-between items-center mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
             <h2 className="text-sm uppercase tracking-wider font-bold text-slate-800 dark:text-white">{initialData ? 'Duplicate Shift' : 'Add New Shift'}</h2>
             <button onClick={onClose} className="p-1 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded"><X className="w-4 h-4" /></button>

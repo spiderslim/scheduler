@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Shift, DAY_START, DAY_SPAN } from '../types/index';
-import { formatTime, cn, roundHalf } from '../lib/utils';
+import { formatTime, cn, roundHalf, clampMealStart } from '../lib/utils';
 import { GripVertical } from 'lucide-react';
 
 interface ShiftBlockProps {
@@ -43,7 +43,7 @@ export default function ShiftBlock({
   let mealLeftPct = 0;
   let mealWidthPct = 0;
   if (localShift.meal) {
-    const mealStartClamped = Math.max(localShift.start, Math.min(localShift.meal.start, localShift.start + localShift.duration - localShift.meal.duration));
+    const mealStartClamped = clampMealStart(localShift);
     mealLeftPct = ((mealStartClamped - localShift.start) / localShift.duration) * 100;
     mealWidthPct = (localShift.meal.duration / localShift.duration) * 100;
   }

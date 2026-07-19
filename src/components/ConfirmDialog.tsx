@@ -35,7 +35,7 @@ export default function ConfirmDialog({ options, onConfirm, onCancel }: ConfirmD
           role="alertdialog"
           aria-modal="true"
           aria-label={title}
-          className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-sm p-6 pointer-events-auto animate-in fade-in zoom-in-95 duration-200"
+          className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-sm p-6 pointer-events-auto"
         >
           <div className="flex items-start gap-3">
             <div
