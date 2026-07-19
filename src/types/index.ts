@@ -23,4 +23,3 @@ export interface Template {
   shifts: Shift[];
   targets: number[];
 }
-
