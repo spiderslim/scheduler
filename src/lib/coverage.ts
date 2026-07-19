@@ -1,5 +1,5 @@
 import { Shift, DAY_START, DAY_SPAN } from '../types/index';
-import { intervalOverlap } from './utils';
+import { clampMealStart, intervalOverlap } from './utils';
 
 export interface HourCoverage {
   hour: number;
@@ -18,10 +18,7 @@ export function shiftWorkInHour(shift: Shift, h: number): number {
   let work = intervalOverlap(s0, s1, h, h + 1);
 
   if (shift.meal && work > 0) {
-    const ms = Math.max(
-      shift.start,
-      Math.min(shift.meal.start, shift.start + shift.duration - shift.meal.duration)
-    );
+    const ms = clampMealStart(shift);
     const mealOverlap = intervalOverlap(ms, ms + shift.meal.duration, h, h + 1);
     work = Math.max(0, work - mealOverlap);
   }
