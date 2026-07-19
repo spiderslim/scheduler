@@ -36,6 +36,12 @@ Then open the URL Vite prints (http://localhost:5173 by default).
 | `npm run lint`    | Type-check the project (`tsc --noEmit`)          |
 | `npm run clean`   | Remove the `dist/` folder                        |
 
-## Deployment
+## Deploy
 
-`npm run build` produces a fully static site in `dist/` that can be hosted on any static host (Cloudflare Pages, Netlify, Firebase Hosting, GitHub Pages, etc.).
+The repo includes a `netlify.toml` (build command `npm run build`, publish directory `dist`, SPA fallback redirect), so deploying to Netlify is one command:
+
+```bash
+npx netlify-cli deploy --prod
+```
+
+No functions or environment variables are needed — the app is client-only with localStorage persistence. Any other static host (Cloudflare Pages, GitHub Pages, Firebase Hosting, etc.) works too: use the same build command (`npm run build`) and output directory (`dist`).
