@@ -6,7 +6,8 @@ import CoverageChart from './components/CoverageChart';
 import TemplatesModal from './components/TemplatesModal';
 import { EditShiftPopover, AddShiftModal } from './components/Modals';
 import ConfirmDialog, { ConfirmOptions } from './components/ConfirmDialog';
-import { Shift, Template, INITIAL_SHIFTS, DEFAULT_TARGETS } from './types/index';
+import { Shift, Template } from './types/index';
+import { INITIAL_SHIFTS, DEFAULT_TARGETS } from './lib/defaults';
 import { decimalFromTimeInput, roundHalf } from './lib/utils';
 import { computeHourlyCoverage, summarizeCoverage } from './lib/coverage';
 import { nextShiftId } from './lib/shiftIds';
@@ -336,7 +337,7 @@ export default function App() {
             <div className="space-y-1">
               <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Roster Coverage</span>
               <p className="text-2xl font-black text-slate-800 dark:text-white leading-none">{stats.scheduledHours.toFixed(1)} hrs</p>
-              <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">{stats.ftCount} FT · {stats.ptCount} PT associates active</p>
+              <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">{stats.ftCount} FT Â· {stats.ptCount} PT associates active</p>
             </div>
             <div className="w-11 h-11 rounded-xl bg-indigo-100 text-indigo-800 dark:bg-indigo-950/45 dark:text-indigo-300 flex items-center justify-center">
               <Clock className="w-5 h-5" />
@@ -440,7 +441,7 @@ export default function App() {
       />
 
       {selectedShiftIds.length > 0 && (
-        <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-[90%] sm:w-auto bg-slate-900 dark:bg-slate-800 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-full shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6 z-50 animate-in slide-in-from-bottom-8 border border-transparent dark:border-slate-700">
+        <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-[90%] sm:w-auto bg-slate-900 dark:bg-slate-800 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-full shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6 z-50 border border-transparent dark:border-slate-700">
           <div className="flex items-center gap-3 text-sm font-semibold w-full sm:w-auto justify-between sm:justify-start">
             <div className="flex items-center gap-3">
               <div className="bg-slate-700 dark:bg-slate-900 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs">

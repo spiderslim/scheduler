@@ -1,8 +1,22 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import type { Shift } from '../types/index';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+/**
+ * Single source of truth for meal-break clamping: keeps the meal start inside
+ * the shift bounds so the meal always fits between shift start and end.
+ * Returns the shift start when the shift has no meal.
+ */
+export function clampMealStart(shift: Shift): number {
+  if (!shift.meal) return shift.start;
+  return Math.max(
+    shift.start,
+    Math.min(shift.meal.start, shift.start + shift.duration - shift.meal.duration)
+  );
 }
 
 export function formatTime(decimalHours: number): string {

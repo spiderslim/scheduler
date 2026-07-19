@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, Plus, RotateCcw, Bookmark, Moon, Sun } from 'lucide-react';
+import { Plus, RotateCcw, Bookmark, Moon, Sun } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 interface NavbarProps {
